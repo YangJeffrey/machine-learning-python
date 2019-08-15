@@ -8,20 +8,20 @@ from tensorflow import keras
 import pickle
 import time
 
-#NAME = "applevlemoncnn-64x2-{}".format(int(time.time()))
-
 DATADIR = "C:/Users/yangj/Downloads/fruits"
 CATEGORIES = ["apple", "lemon"]
 
 for category in CATEGORIES:
   path = os.path.join(DATADIR, category)
   for img in os.listdir(path):
-    img_array = cv2.imread(os.path.join(path,img), cv2.IMREAD_GRAYSCALE)
+    img_array = cv2.imread(os.path.join(path,img), cv2.IMREAD_COLOR)
     break
   break
 
 IMG_SIZE = 50
-new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
+new_array = cv2.cvtColor(cv2.resize(img_array, (IMG_SIZE, IMG_SIZE)), cv2.COLOR_BGR2RGB)
+#plt.imshow(new_array)
+#plt.show()
 
 training_data = []
 def create_training_data():
@@ -42,19 +42,19 @@ for features, label in training_data:
   y.append(label)
 X = np.array(X).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
 
-pickle_out = open("X.pickle", "wb")
-pickle.dump(X, pickle_out)
-pickle_out.close()
+#pickle_out = open("X.pickle", "wb")
+#pickle.dump(X, pickle_out)
+#pickle_out.close()
 
-pickle_out = open("y.pickle", "wb")
-pickle.dump(y, pickle_out)
-pickle_out.close()
+#pickle_out = open("y.pickle", "wb")
+#pickle.dump(y, pickle_out)
+#pickle_out.close()
 
 pickle_in = open("X.pickle","rb")
 X = pickle.load(pickle_in)
 
-X = pickle.load(open("X.pickle","rb"))
-y = pickle.load(open("y.pickle","rb"))
+pickle_in = open("y.pickle","rb")
+y = pickle.load(pickle_in)
 
 X = X/255.0
 
@@ -81,7 +81,7 @@ for dense_layer in dense_layers:
 
       model.add(tf.keras.layers.Flatten()) #3D feature maps to 1D feature wectors
       for l in range(dense_layer):
-        model.add(tf.keras.layers.Dense(512))
+        model.add(tf.keras.layers.Dense(layer_size))
         model.add(tf.keras.layers.Activation("relu"))
         model.add(tf.keras.layers.Dropout(0.2))
 
@@ -95,4 +95,6 @@ for dense_layer in dense_layers:
                   optimizer="adam",
                   metrics=['accuracy'])
 
-      model.fit(X, y, batch_size=1, epochs=10, validation_split=0.2, callbacks=[tensorboard])
+      model.fit(X, y, batch_size=1, epochs=10, validation_split=0.1, callbacks=[tensorboard])
+
+model.save('fruitCNN.model')
