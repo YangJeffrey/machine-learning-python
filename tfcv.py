@@ -58,9 +58,9 @@ y = pickle.load(open("y.pickle","rb"))
 
 X = X/255.0
 
-dense_layers = [0, 1, 2]
-layer_sizes = [32, 64, 128]
-conv_layers = [1, 2, 3]
+dense_layers = [1]
+layer_sizes = [128]
+conv_layers = [2]
 
 for dense_layer in dense_layers:
   for layer_size in layer_sizes:
@@ -81,8 +81,9 @@ for dense_layer in dense_layers:
 
       model.add(tf.keras.layers.Flatten()) #3D feature maps to 1D feature wectors
       for l in range(dense_layer):
-        model.add(tf.keras.layers.Dense(layer_size))
+        model.add(tf.keras.layers.Dense(512))
         model.add(tf.keras.layers.Activation("relu"))
+        model.add(tf.keras.layers.Dropout(0.2))
 
       #model.add(tf.keras.layers.Dense(64))
       #model.add(tf.keras.layers.Activation('relu'))
@@ -94,4 +95,4 @@ for dense_layer in dense_layers:
                   optimizer="adam",
                   metrics=['accuracy'])
 
-      model.fit(X, y, batch_size=1, epochs=3, validation_split=0.1, callbacks=[tensorboard])
+      model.fit(X, y, batch_size=1, epochs=10, validation_split=0.2, callbacks=[tensorboard])
