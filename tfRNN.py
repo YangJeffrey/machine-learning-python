@@ -8,10 +8,15 @@ from sklearn import preprocessing
 from collections import deque
 import random
 import time
+import tensorflow as tf
+from tensorflow import keras
 
 SEQ_LEN = 60
 FUTURE_PERIOD_PREDICT = 3
 RATIO_TO_PREDICT = "LTC-USD"
+EPOCHS = 1
+BATCH_SIZE = 64
+NAME = f"{SEQ_LEN}-SEQ-{FUTURE_PERIOD_PREDICT}-PREDICT-{int(time.time())}"
 
 def classify(current, future):
     if float(future) > float(current):
@@ -104,3 +109,43 @@ validation_x, validation_y = preprocess_df(validation_main_df)
 print(f"train data: {len(train_x)} validation: {len(validation_x)}")
 print(f"dont buys: {train_y.count(0)}, buys: {train_y.count(1)}")
 print(f"VAL dont buys: {validation_y.count(0)}, VAL buys: {validation_y.count(1)}")
+
+model = tf.keras.models.Sequential()
+model.add(tf.keras.layers.LSTM(128, input_shape=(train_x.shape[1:]), activation='tanh', return_sequences=True))
+#model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
+model.add(tf.keras.layers.Dropout(0.2))
+model.add(tf.keras.layers.BatchNormalization())
+
+model.add(tf.keras.layers.LSTM(128, input_shape=(train_x.shape[1:]), activation='tanh', return_sequences=True))
+#model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
+model.add(tf.keras.layers.Dropout(0.1))
+model.add(tf.keras.layers.BatchNormalization())
+
+model.add(tf.keras.layers.LSTM(128, input_shape=(train_x.shape[1:]), activation='tanh'))
+#model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
+model.add(tf.keras.layers.Dropout(0.2))
+model.add(tf.keras.layers.BatchNormalization())
+
+model.add(tf.keras.layers.Dense(32, activation="relu"))
+model.add(tf.keras.layers.Dropout(0.2))
+
+model.add(tf.keras.layers.Dense(2, activation="softmax"))
+
+opt = tf.keras.optimizers.Adam(lr=0.001, decay=1e-6)
+
+model.compile(loss='sparse_categorical_crossentropy',
+    optimizer=opt,
+    metrics=['accuracy'])
+
+tensorboard = tf.keras.callbacks.Tensorboard(logdir=f'logs/{NAME}')
+#tensorboard = tf.keras.callbacks.Tensorboard(logdir=f'C:\\logs\\{NAME}')
+
+filepath = "RNN_Final-{epoch:02d}-{val_acc:.3f}"
+checkpoint = tf.keras.callbacks.ModelCheckpoint("models/{}.model".format(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max'))
+
+history = model.fit(
+    train_x, train_y,
+    batch_size=BATCH_SIZE,
+    epochs=EPOCHS,
+    validation_data=(validation_x, validation_y),
+    callbacks=[tensorboard, checkpoint])
