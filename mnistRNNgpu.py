@@ -10,7 +10,7 @@ x_test = x_test/255.0
 model = tf.keras.models.Sequential()
 
 #CuDNNLSTM uses tanh activation function
-model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(x_train.shape[1:]), activation='relu', return_sequences=True))
+model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(x_train.shape[1:]), return_sequences=True))
 model.add(tf.keras.layer.Dropout(0.2))
 
 model.add(tf.keras.layers.CuDNNLSTM(128))
