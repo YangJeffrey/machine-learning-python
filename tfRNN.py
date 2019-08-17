@@ -13,10 +13,10 @@ from tensorflow import keras
 
 SEQ_LEN = 60
 FUTURE_PERIOD_PREDICT = 3
-RATIO_TO_PREDICT = "LTC-USD"
-EPOCHS = 1
+RATIO_TO_PREDICT = "BTC-USD"
+EPOCHS = 10
 BATCH_SIZE = 64
-NAME = f"{SEQ_LEN}-SEQ-{FUTURE_PERIOD_PREDICT}-PREDICT-{int(time.time())}"
+NAME = f"{RATIO_TO_PREDICT}-{SEQ_LEN}-SEQ-{FUTURE_PERIOD_PREDICT}-PREDICT-{int(time.time())}"
 
 def classify(current, future):
     if float(future) > float(current):
@@ -137,8 +137,8 @@ model.compile(loss='sparse_categorical_crossentropy',
     optimizer=opt,
     metrics=['accuracy'])
 
-tensorboard = tf.keras.callbacks.Tensorboard(logdir=f'logs/{NAME}')
-#tensorboard = tf.keras.callbacks.Tensorboard(logdir=f'C:\\logs\\{NAME}')
+tensorboard =tf.keras.callbacks.TensorBoard(log_dir=f'logs/{NAME}')
+#tensorboard = tf.keras.callbacks.Tensorboard(log_dir=f'C:\\logs\\{NAME}')
 
 filepath = "RNN_Final-{epoch:02d}-{val_acc:.3f}"
 checkpoint = tf.keras.callbacks.ModelCheckpoint("models/{}.model".format(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max'))
