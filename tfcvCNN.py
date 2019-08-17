@@ -97,3 +97,6 @@ for dense_layer in dense_layers:
       model.fit(X, y, batch_size=1, epochs=10, validation_split=0.1, callbacks=[tensorboard])
 
 model.save('fruitCNN.model')
+
+#in terminal: tensorboard --logdir==training:your_log_dir --host=127.0.0.1
+#in browser: localhost:6006
