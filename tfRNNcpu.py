@@ -95,7 +95,6 @@ for ratio in ratios:
 
 main_df['future'] = main_df[f"{RATIO_TO_PREDICT}_close"].shift(-FUTURE_PERIOD_PREDICT)
 main_df['target'] = list(map(classify, main_df[f"{RATIO_TO_PREDICT}_close"], main_df["future"]))
-#print(main_df[[f"{RATIO_TO_PREDICT}_close", "future", "target"]].head(10))
 
 times = sorted(main_df.index.values)
 last_5pct = times[-int(0.05 * len(times))]
@@ -112,17 +111,14 @@ print(f"VAL dont buys: {validation_y.count(0)}, VAL buys: {validation_y.count(1)
 
 model = tf.keras.models.Sequential()
 model.add(tf.keras.layers.LSTM(128, input_shape=(train_x.shape[1:]), activation='tanh', return_sequences=True))
-#model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
 model.add(tf.keras.layers.Dropout(0.2))
 model.add(tf.keras.layers.BatchNormalization())
 
 model.add(tf.keras.layers.LSTM(128, input_shape=(train_x.shape[1:]), activation='tanh', return_sequences=True))
-#model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
 model.add(tf.keras.layers.Dropout(0.1))
 model.add(tf.keras.layers.BatchNormalization())
 
 model.add(tf.keras.layers.LSTM(128, input_shape=(train_x.shape[1:]), activation='tanh'))
-#model.add(tf.keras.layers.CuDNNLSTM(128, input_shape=(train_x.shape[1:]), return_sequences=True))
 model.add(tf.keras.layers.Dropout(0.2))
 model.add(tf.keras.layers.BatchNormalization())
 
