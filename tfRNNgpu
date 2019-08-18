@@ -1,5 +1,8 @@
 #prediction of cryptocurrency prices
 #https://pythonprogramming.net/static/downloads/machine-learning-data/crypto_data.zip
+#if google colab: 
+#from google.colab import drive
+#drive.mount('/content/drive')
 
 import pandas as pd
 import numpy as np
@@ -81,6 +84,7 @@ main_df = pd.DataFrame()
 ratios = ["BTC-USD", "LTC-USD", "ETH-USD", "BCH-USD"]
 for ratio in ratios:
     dataset = f"crypto_data/{ratio}.csv"
+    #google colab:  dataset = "drive/My Drive/crypto_data"
 
     df = pd.read_csv(dataset, names=["time", "low", "high", "open", "close", "volume"])
     df.rename(columns={"close": f"{ratio}_close", "volume":f"{ratio}_volume"}, inplace=True)
